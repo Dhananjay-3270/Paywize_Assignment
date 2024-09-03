@@ -15,6 +15,16 @@ const Canvas = () => {
     const brushSize = useSelector((state) => state.tool.brushSize);
     const [startPos, setStartPos] = useState({ x: 0, y: 0 });
 
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        const context = canvas.getContext("2d");
+        context.strokeStyle = color;
+        context.lineWidth = brushSize;
+        context.lineCap = "round";
+        contextRef.current = context;
+      }, [color, brushSize]);
+
+
     const initCanvas = () => {
     
         const canvas = canvasRef.current;
@@ -29,18 +39,16 @@ const Canvas = () => {
         const startX = e.clientX - rect.left;
         const startY = e.clientY - rect.top;
         setStartPos({ x: startX, y: startY });
-        dispatch(
-          addbrushaction({ point: { x: startX, y: startY }, newStroke: true })
-        );
         setDrawing(true);
     
         if (currentTool === "brush") {
+          dispatch(addbrushaction({ point: { x: startX, y: startY }, newStroke: true }));
           const context = contextRef.current;
           context.beginPath();
           context.moveTo(startX, startY);
         }
       };
-
+    
       const handleMouseMove = (e) => {
         if (!isDrawing) return;
     
@@ -51,47 +59,60 @@ const Canvas = () => {
         const currentY = e.clientY - rect.top;
     
         if (currentTool === "brush") {
-          drawBrush(context, { x: currentX, y: currentY }, color, brushSize);
-          dispatch(
-            addbrushaction({
-              point: { x: currentX, y: currentY },
-              newStroke: false,
-            })
-          );
+          context.lineTo(currentX, currentY);
+          context.stroke();
+          dispatch(addbrushaction({ point: { x: currentX, y: currentY }, newStroke: false }));
         } else {
           context.clearRect(0, 0, canvas.width, canvas.height);
           redrawCanvas();
-          drawShape(
-            context,
-            startPos,
-            { x: currentX, y: currentY },
-            currentTool,
-            color,
-            brushSize
-          );
+          drawShape(context, startPos, { x: currentX, y: currentY }, currentTool, color, brushSize);
         }
       };
     
       const handleMouseUp = (e) => {
-        if (!isDrawing) return;
-    
-        const rect = canvasRef.current.getBoundingClientRect();
-        const endX = e.clientX - rect.left;
-        const endY = e.clientY - rect.top;
-        const s = brushSize;
-        const clr = color;
+        setDrawing(false);
         if (currentTool !== "brush") {
+          const rect = canvasRef.current.getBoundingClientRect();
+          const endX = e.clientX - rect.left;
+          const endY = e.clientY - rect.top;
           const newShape = {
             type: currentTool,
             start: startPos,
             end: { x: endX, y: endY },
-            size: s,
-            color: clr,
+            size: brushSize,
+            color: color,
           };
           dispatch(addAction(newShape));
         }
+      };
+      const redrawCanvas = () => {
+        redrawBrush();
+        const context = contextRef.current;
+        actions.forEach((shape) => {
+          drawShape(context, shape.start, shape.end, shape.type, shape.color, shape.size);
+        });
+      };
     
-        setDrawing(false);
+      useEffect(() => {
+        redrawCanvas();
+      }, [actions, bactions]);
+    
+      const drawShape = (context, start, end, shape, color, size) => {
+        context.beginPath();
+        context.strokeStyle = color;
+        context.lineWidth = size;
+    
+        if (shape === "rectangle") {
+          context.rect(start.x, start.y, end.x - start.x, end.y - start.y);
+        } else if (shape === "circle") {
+          const radius = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
+          context.arc(start.x, start.y, radius, 0, 2 * Math.PI);
+        } else if (shape === "line") {
+          context.moveTo(start.x, start.y);
+          context.lineTo(end.x, end.y);
+        }
+    
+        context.stroke();
       };
 
   return (
