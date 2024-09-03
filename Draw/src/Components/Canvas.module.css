@@ -1,0 +1,11 @@
+.canvas {
+    cursor: pointer;
+    border: solid 3px black;
+    background-color: white;
+  }
+  .canvasdrawing {
+    cursor: pointer;
+    border: solid 3px rgb(8, 169, 198);
+    background-color: white;
+  }
+  
