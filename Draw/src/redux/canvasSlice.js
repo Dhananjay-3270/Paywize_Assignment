@@ -9,7 +9,7 @@ export const canvasSlice = createSlice({
   },
   reducers: {
     addbrushaction(state, action) {
-      // Add the new points to the last brush action
+     
       if (state.brushactions.length === 0 || action.payload.newStroke) {
         state.brushactions.push([action.payload.point]);
       } else {

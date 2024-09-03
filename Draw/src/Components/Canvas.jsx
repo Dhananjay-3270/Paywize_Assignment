@@ -84,7 +84,22 @@ const Canvas = () => {
           };
           dispatch(addAction(newShape));
         }
-      };
+        const redrawBrush = () => {
+            const context = contextRef.current;
+            context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+            bactions.forEach((stroke) => {
+              context.beginPath();
+              stroke.forEach((point, index) => {
+                if (index === 0) {
+                  context.moveTo(point.x, point.y);
+                } else {
+                  context.lineTo(point.x, point.y);
+                }
+              });
+              context.stroke();
+            });
+          };
+      }; 
       const redrawCanvas = () => {
         redrawBrush();
         const context = contextRef.current;
