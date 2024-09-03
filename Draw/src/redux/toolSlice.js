@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const toolSlice = createSlice({
   name: "tool",
   initialState: {
-    currentTool: "brush",
+    currentTool: "line",
     color: "#000000",
     brushSize: 1,
   },

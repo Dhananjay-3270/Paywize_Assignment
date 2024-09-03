@@ -1,7 +1,16 @@
-.main{
+.main {
   display: flex;
-  min-height: 100vh;
-  min-width: 100vw;
-  padding: 15px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  background-color: #f0f0f0;
+  height: 100vh;
+  box-sizing: border-box;
+  gap: 20px;
+}
 
+canvas {
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
 }

@@ -6,10 +6,11 @@ export const canvasSlice = createSlice({
     actions: [],
     brushactions: [],
     undoStack: [],
+    brushUndoStack: []
   },
   reducers: {
     addbrushaction(state, action) {
-     
+      // Add the new points to the last brush action
       if (state.brushactions.length === 0 || action.payload.newStroke) {
         state.brushactions.push([action.payload.point]);
       } else {
@@ -25,8 +26,8 @@ export const canvasSlice = createSlice({
     },
     undo(state) {
       if (state.actions.length > 0) {
-        const lastaction = state.actions.pop();
-        state.undoStack.push(lastaction);
+        const lastAction = state.actions.pop();
+        state.undoStack.push(lastAction);
       }
     },
     redo(state) {
@@ -35,8 +36,20 @@ export const canvasSlice = createSlice({
         state.actions.push(lastUndone);
       }
     },
+    removeLastBrushAction(state) {
+      if (state.brushactions.length > 0) {
+        const lastBrushAction = state.brushactions.pop();
+        state.brushUndoStack.push(lastBrushAction);
+      }
+    },
+    redoLastBrushAction(state) {
+      if (state.brushUndoStack.length > 0) {
+        const lastUndoneBrush = state.brushUndoStack.pop();
+        state.brushactions.push(lastUndoneBrush);
+      }
+    },
   },
 });
 
-export const { addAction, undo, redo, addbrushaction } = canvasSlice.actions;
+export const { addAction, undo, redo, addbrushaction ,removeLastBrushAction, redoLastBrushAction  } = canvasSlice.actions;
 export default canvasSlice.reducer;

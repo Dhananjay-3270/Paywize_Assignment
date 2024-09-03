@@ -1,19 +1,41 @@
 .toolbar {
-    margin: 10px;
-    height: 400px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    background-color: white;
-    border: solid 2px white;
-    border-radius: 8px;
-  }
-  
-  .btn {
-    border: solid 1px rgb(109, 107, 107);
-    border-radius: 4px;
-    cursor: pointer;
-  
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #ffffff;
+  border: 2px solid #007ACC;
+  border-radius: 10px;
+  padding: 15px;
+  gap: 15px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: #f0f0f0;
+  border: 2px solid #cccccc;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #007ACC;
+  border-color: #007ACC;
+  color: #ffffff;
+}
+
+input[type="range"] {
+  width: 150px;
+  margin-top: 10px;
+}
+
+label {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: #555555;
+}
