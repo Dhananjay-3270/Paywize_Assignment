@@ -24,11 +24,75 @@ const Canvas = () => {
         contextRef.current = context;
       };
 
-  const handleMouseDown = () => {};
+      const handleMouseDown = (e) => {
+        const rect = canvasRef.current.getBoundingClientRect();
+        const startX = e.clientX - rect.left;
+        const startY = e.clientY - rect.top;
+        setStartPos({ x: startX, y: startY });
+        dispatch(
+          addbrushaction({ point: { x: startX, y: startY }, newStroke: true })
+        );
+        setDrawing(true);
+    
+        if (currentTool === "brush") {
+          const context = contextRef.current;
+          context.beginPath();
+          context.moveTo(startX, startY);
+        }
+      };
 
-  const handleMouseMove = () => {};
-
-  const handleMouseUp = () => {};
+      const handleMouseMove = (e) => {
+        if (!isDrawing) return;
+    
+        const canvas = canvasRef.current;
+        const context = contextRef.current;
+        const rect = canvas.getBoundingClientRect();
+        const currentX = e.clientX - rect.left;
+        const currentY = e.clientY - rect.top;
+    
+        if (currentTool === "brush") {
+          drawBrush(context, { x: currentX, y: currentY }, color, brushSize);
+          dispatch(
+            addbrushaction({
+              point: { x: currentX, y: currentY },
+              newStroke: false,
+            })
+          );
+        } else {
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          redrawCanvas();
+          drawShape(
+            context,
+            startPos,
+            { x: currentX, y: currentY },
+            currentTool,
+            color,
+            brushSize
+          );
+        }
+      };
+    
+      const handleMouseUp = (e) => {
+        if (!isDrawing) return;
+    
+        const rect = canvasRef.current.getBoundingClientRect();
+        const endX = e.clientX - rect.left;
+        const endY = e.clientY - rect.top;
+        const s = brushSize;
+        const clr = color;
+        if (currentTool !== "brush") {
+          const newShape = {
+            type: currentTool,
+            start: startPos,
+            end: { x: endX, y: endY },
+            size: s,
+            color: clr,
+          };
+          dispatch(addAction(newShape));
+        }
+    
+        setDrawing(false);
+      };
 
   return (
     <canvas
