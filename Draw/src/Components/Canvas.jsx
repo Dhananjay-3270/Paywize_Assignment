@@ -1,4 +1,4 @@
-import  { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addAction, addbrushaction } from "../redux/canvasSlice";
 import styles from "./Canvas.module.css";
@@ -24,6 +24,7 @@ const Canvas = () => {
     contextRef.current = context;
   }, [color, brushSize]);
 
+  // Start drawing when the mouse is pressed down
   const handleMouseDown = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
     const startX = e.clientX - rect.left;
@@ -39,6 +40,7 @@ const Canvas = () => {
     }
   };
 
+  // Draw on the canvas while the mouse is moving
   const handleMouseMove = (e) => {
     if (!isDrawing) return;
 
@@ -59,6 +61,7 @@ const Canvas = () => {
     }
   };
 
+  // Stop drawing and finalize the shape or brush action
   const handleMouseUp = (e) => {
     setDrawing(false);
     if (currentTool !== "brush") {
@@ -76,6 +79,7 @@ const Canvas = () => {
     }
   };
 
+  // Redraw all brush actions on the canvas
   const redrawBrush = () => {
     const context = contextRef.current;
     context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
@@ -92,6 +96,7 @@ const Canvas = () => {
     });
   };
 
+  // Redraw the entire canvas including all shapes and brush strokes
   const redrawCanvas = () => {
     redrawBrush();
     const context = contextRef.current;
@@ -104,6 +109,7 @@ const Canvas = () => {
     redrawCanvas();
   }, [actions, bactions]);
 
+  // Helper function to draw shapes on the canvas
   const drawShape = (context, start, end, shape, color, size) => {
     context.beginPath();
     context.strokeStyle = color;

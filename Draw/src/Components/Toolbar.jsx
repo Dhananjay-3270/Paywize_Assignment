@@ -1,4 +1,3 @@
-
 import { useSelector, useDispatch } from "react-redux";
 import {
   undo,
@@ -22,6 +21,7 @@ const Toolbar = () => {
   const currentTool = useSelector((state) => state.tool.currentTool);
   const dispatch = useDispatch();
 
+  // Undo the last action or brush stroke
   const handleUndo = () => {
     if (currentTool === "brush") {
       dispatch(removeLastBrushAction());
@@ -30,6 +30,7 @@ const Toolbar = () => {
     }
   };
 
+  // Redo the last undone action or brush stroke
   const handleRedo = () => {
     if (currentTool === "brush") {
       dispatch(redoLastBrushAction());
