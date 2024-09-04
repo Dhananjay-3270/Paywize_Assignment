@@ -1,7 +1,12 @@
+// Canvas.jsx
 import { useRef, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addAction, addbrushaction } from "../redux/canvasSlice";
+import io from "socket.io-client"; 
 import styles from "./Canvas.module.css";
+
+
+const SOCKET_SERVER_URL = "http://localhost:5000/";
 
 const Canvas = () => {
   const canvasRef = useRef(null);
@@ -16,6 +21,24 @@ const Canvas = () => {
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
+    const socket = io(SOCKET_SERVER_URL);
+
+    // Listen for incoming brush actions
+    socket.on("brushAction", (brushAction) => {
+      dispatch(addbrushaction(brushAction));
+    });
+
+    // Listen for incoming shape actions
+    socket.on("shapeAction", (shapeAction) => {
+      dispatch(addAction(shapeAction));
+    });
+
+    return () => {
+      socket.disconnect(); // Clean up on component unmount
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
     context.strokeStyle = color;
@@ -24,7 +47,6 @@ const Canvas = () => {
     contextRef.current = context;
   }, [color, brushSize]);
 
-  // Start drawing when the mouse is pressed down
   const handleMouseDown = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
     const startX = e.clientX - rect.left;
@@ -37,10 +59,13 @@ const Canvas = () => {
       const context = contextRef.current;
       context.beginPath();
       context.moveTo(startX, startY);
+
+      // Emit brsh action to server
+      const socket = io(SOCKET_SERVER_URL);
+      socket.emit("brushAction", { point: { x: startX, y: startY }, newStroke: true });
     }
   };
 
-  // Draw on the canvas while the mouse is moving
   const handleMouseMove = (e) => {
     if (!isDrawing) return;
 
@@ -54,6 +79,10 @@ const Canvas = () => {
       context.lineTo(currentX, currentY);
       context.stroke();
       dispatch(addbrushaction({ point: { x: currentX, y: currentY }, newStroke: false }));
+
+      // Emit brush action t server
+      const socket = io(SOCKET_SERVER_URL);
+      socket.emit("brushAction", { point: { x: currentX, y: currentY }, newStroke: false });
     } else {
       context.clearRect(0, 0, canvas.width, canvas.height);
       redrawCanvas();
@@ -61,7 +90,6 @@ const Canvas = () => {
     }
   };
 
-  // Stop drawing and finalize the shape or brush action
   const handleMouseUp = (e) => {
     setDrawing(false);
     if (currentTool !== "brush") {
@@ -76,10 +104,13 @@ const Canvas = () => {
         color: color,
       };
       dispatch(addAction(newShape));
+
+      // Emit shape action to server
+      const socket = io(SOCKET_SERVER_URL);
+      socket.emit("shapeAction", newShape);
     }
   };
 
-  // Redraw all brush actions on the canvas
   const redrawBrush = () => {
     const context = contextRef.current;
     context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
@@ -96,7 +127,6 @@ const Canvas = () => {
     });
   };
 
-  // Redraw the entire canvas including all shapes and brush strokes
   const redrawCanvas = () => {
     redrawBrush();
     const context = contextRef.current;
@@ -109,7 +139,6 @@ const Canvas = () => {
     redrawCanvas();
   }, [actions, bactions]);
 
-  // Helper function to draw shapes on the canvas
   const drawShape = (context, start, end, shape, color, size) => {
     context.beginPath();
     context.strokeStyle = color;
