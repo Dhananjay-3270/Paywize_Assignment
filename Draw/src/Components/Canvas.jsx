@@ -1,4 +1,4 @@
-// Canvas.jsx
+
 import { useRef, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addAction, addbrushaction } from "../redux/canvasSlice";
