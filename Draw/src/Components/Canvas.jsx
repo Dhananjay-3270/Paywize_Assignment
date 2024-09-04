@@ -2,11 +2,11 @@
 import { useRef, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addAction, addbrushaction } from "../redux/canvasSlice";
-import io from "socket.io-client"; 
+
 import styles from "./Canvas.module.css";
 
 
-const SOCKET_SERVER_URL = "http://localhost:5000/";
+
 
 const Canvas = () => {
   const canvasRef = useRef(null);
@@ -20,23 +20,23 @@ const Canvas = () => {
   const brushSize = useSelector((state) => state.tool.brushSize);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
 
-  useEffect(() => {
-    const socket = io(SOCKET_SERVER_URL);
+  // useEffect(() => {
+  //   const socket = io(SOCKET_SERVER_URL);
 
-    // Listen for incoming brush actions
-    socket.on("brushAction", (brushAction) => {
-      dispatch(addbrushaction(brushAction));
-    });
+  //   // Listen for incoming brush actions
+  //   socket.on("brushAction", (brushAction) => {
+  //     dispatch(addbrushaction(brushAction));
+  //   });
 
-    // Listen for incoming shape actions
-    socket.on("shapeAction", (shapeAction) => {
-      dispatch(addAction(shapeAction));
-    });
+  //   // Listen for incoming shape actions
+  //   socket.on("shapeAction", (shapeAction) => {
+  //     dispatch(addAction(shapeAction));
+  //   });
 
-    return () => {
-      socket.disconnect(); // Clean up on component unmount
-    };
-  }, [dispatch]);
+  //   return () => {
+  //     socket.disconnect(); // Clean up on component unmount
+  //   };
+  // }, [dispatch]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -61,8 +61,8 @@ const Canvas = () => {
       context.moveTo(startX, startY);
 
       // Emit brsh action to server
-      const socket = io(SOCKET_SERVER_URL);
-      socket.emit("brushAction", { point: { x: startX, y: startY }, newStroke: true });
+      // const socket = io(SOCKET_SERVER_URL);
+      // socket.emit("brushAction", { point: { x: startX, y: startY }, newStroke: true });
     }
   };
 
